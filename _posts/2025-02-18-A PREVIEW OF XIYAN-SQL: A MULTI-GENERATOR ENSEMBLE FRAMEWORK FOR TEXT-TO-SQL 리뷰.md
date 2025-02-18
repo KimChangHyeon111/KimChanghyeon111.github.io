@@ -9,8 +9,6 @@ toc: True
 toc_sticky: True
 ---
 
-# A PREVIEW OF XIYAN-SQL: A MULTI-GENERATOR ENSEMBLE FRAMEWORK FOR TEXT-TO-SQL 리뷰
-
 기존의 LLM기반 NL2SQL 솔류션에는 2가지 접근법 존재
   - 프롬프트 엔지니어링
     - zero / few shot 프롬프트를 GPT / Gemini등에 사용해좋은 결과를 나타냈지만, 추론 오버헤드를 초래하는 경우가 많음.
