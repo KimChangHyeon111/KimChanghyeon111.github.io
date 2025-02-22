@@ -67,6 +67,52 @@ toc_sticky: True
 ![image](https://github.com/user-attachments/assets/28763e5c-7766-4765-8a46-3903c5844a42)
 
 ## Benchmark
+
+| **벤치마크** | **DB 종류** | **XiYan-SQL EX(%)** | **기존 최고 모델 EX(%)** | **출처** |
+|-------------|-----------|------------------|------------------|--------|
+| **Bird** | SQLite | **75.63%** | 74.79% (CHASE-SQL + Gemini) | Table 2, p.7 |
+| **Spider** | SQLite | **89.65%** | 89.6% (MCS-SQL + GPT-4) | Table 3, p.7 |
+| **SQL-Eval** | PostgreSQL | **69.86%** | 67.86% (Gemini 1.5 Pro) | Table 4, p.8 |
+| **NL2GQL** | nGQL (Graph DB) | **41.20%** | 18.06% (DeepSeek) | Table 5, p.8 |
+
+---
+
+## 벤치마크별 설명
+
+### Bird Benchmark
+- **설명:**  
+  - Bird 벤치마크는 **다양한 SQL 쿼리 스타일과 복잡한 질의(Nested Query, Aggregation, Join 등)**를 포함.
+  - XiYan-SQL은 **5개 후보만으로 최고 성능(75.63%)을 기록**, 기존 **CHASE-SQL(21개 후보 생성 후 투표 방식, 74.79%)** 대비 효율적.
+---
+
+###  Spider Benchmark
+- **설명:**  
+  - Spider 데이터셋은 **도메인 간 일반화 능력을 평가하는 대표적인 NL2SQL 벤치마크**.
+  - 학습 데이터와 테스트 데이터에 **서로 다른 데이터베이스를 사용**하여 **새로운 환경에서도 정확한 SQL을 생성할 수 있는지 평가**.
+  - XiYan-SQL은 **기존 최고 성능(89.6%)을 갱신하여 89.65% 기록**.
+---
+
+### SQL-Eval Benchmark
+- **설명:**  
+  - SQL-Eval은 PostgreSQL을 기반으로 한 **실제 SQL 환경에서의 모델 성능을 평가하는 벤치마크**.
+  - **오픈소스 평가 데이터셋으로 구성**되었으며, SQL 문법 및 실행 가능성을 중점적으로 테스트.
+  - XiYan-SQL은 **69.86%의 성능으로 기존 모델보다 2~5% 높은 정확도 기록**.
+
+---
+
+### NL2GQL Benchmark
+- **설명:**  
+  - NL2GQL은 **관계형 데이터베이스(RDB)가 아닌 그래프 데이터베이스(Graph DB, nGQL)를 대상으로 한 벤치마크**.
+  - 일반적인 SQL과 다르게 **그래프 쿼리 언어(GQL)의 특성을 반영한 평가 기준을 사용**.
+  - XiYan-SQL은 **41.20%의 성능을 기록하며 기존 GPT-4o(4.86%) 대비 압도적인 성능 향상**.
+
+---
+
+## **3. 결론**
+- XiYan-SQL은 **모든 벤치마크에서 최고 성능을 기록하며, 기존 LLM 기반 및 Fine-Tuning 기반 Text-to-SQL 모델을 초월**.
+- 특히 **Bird, Spider, SQL-Eval, NL2GQL 데이터셋 모두에서 SOTA(State-of-the-Art) 성능 달성**.
+- **Schema Linking + Multi-Generator Ensemble 기법이 성능 향상에 크게 기여**.
+
 ![image](https://github.com/user-attachments/assets/4d5c4f93-83c7-4c04-b43b-8907027d9eb2)
 ![image](https://github.com/user-attachments/assets/95d8ec40-b9af-4ca3-b381-a097b2b4adff)
 ![image](https://github.com/user-attachments/assets/12fe5af1-070a-4e7d-b397-01f9c59f9eff)
