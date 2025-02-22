@@ -58,6 +58,7 @@ toc_sticky: True
 
 
 3. SQL Refiner : 이후 SQL의 논리적 / 구문오류를 가지고 오류를 수정할 수 있습니다. 스키마 관련 컨텍스트, SQL 쿼리 및 실행결과 기반으로 반복 실행합니다.
+   
 ![image](https://github.com/user-attachments/assets/01556bd8-9338-4b18-9702-9ac128f73fc4)
 
 
@@ -82,7 +83,7 @@ toc_sticky: True
 ### Bird Benchmark
 - **설명:**  
   - Bird 벤치마크는 **다양한 SQL 쿼리 스타일과 복잡한 질의(Nested Query, Aggregation, Join 등)**를 포함.
-  - XiYan-SQL은 **5개 후보만으로 최고 성능(75.63%)을 기록**, 기존 **CHASE-SQL(21개 후보 생성 후 투표 방식, 74.79%)** 대비 효율적.
+  - XiYan-SQL은 **5개 후보만으로 최고 성능(75.63%)을 기록**, 기존 CHASE-SQL(21개 후보 생성 후 투표 방식, 74.79%) 대비 효율적.
 ---
 
 ###  Spider Benchmark
