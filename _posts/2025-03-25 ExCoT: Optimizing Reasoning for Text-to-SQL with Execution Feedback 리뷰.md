@@ -1,7 +1,12 @@
-# ExCoT 논문 요약 & 원문 인용 정리
-*Execution‑Guided Chain‑of‑Thought Direct Preference Optimization*  
-Bohan Zhai et al., 2025 (Snowflake Inc.)
-
+---
+layout: posts
+title: " ExCoT: Optimizing Reasoning for Text-to-SQL with Execution Feedback 리뷰"
+summary: ExCoT: Optimizing Reasoning for Text-to-SQL with Execution Feedback 리뷰
+author: Kim Changhyeon
+categories: papers
+published: True
+toc: True
+toc_sticky: True
 ---
 
 ## 1. 연구 배경 및 문제의식
