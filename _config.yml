@@ -325,3 +325,8 @@ defaults:
       comments: # true
       share: true
       related: true
+
+# 검색용 플러그인
+plugins:
+  - jekyll-sitemap
+  - jekyll-seo-tag
