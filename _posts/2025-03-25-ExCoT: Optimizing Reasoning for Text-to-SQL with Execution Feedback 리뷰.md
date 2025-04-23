@@ -1,7 +1,7 @@
 ---
 layout: posts
 title: "ExCoT: Optimizing Reasoning for Text-to-SQL with Execution Feedback 리뷰"
-summary: "ExCoT" Optimizing Reasoning for Text-to-SQL with Execution Feedback 리뷰"
+summary: "ExCoT: Optimizing Reasoning for Text-to-SQL with Execution Feedback 리뷰"
 author: Kim Changhyeon
 categories: papers
 published: True
