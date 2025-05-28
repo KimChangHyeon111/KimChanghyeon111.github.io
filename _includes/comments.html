@@ -193,11 +193,14 @@
       <h4 class="page__comments-title">{{ comments_label }}</h4>
       <section id="cusdis-comments">
         <div id="cusdis_thread"
+             style="height: auto !important; max-height: none !important; overflow: visible !important;"
              data-host="https://cusdis.com"
              data-app-id="42f9f7e9-4d85-4c12-98ad-72b74c96345a"
-             data-page-id="{{ PAGE_ID }}"
-             data-page-url="{{ PAGE_URL }}"
-             data-page-title="{{ PAGE_TITLE }}"></div>
+             data-page-id="{{ page.url }}"
+             data-page-url="{{ page.url | absolute_url }}"
+             data-page-title="{{ page.title }}"
+             data-lang="ko">
+        </div>
         <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
       </section>
   {% endcase %}
