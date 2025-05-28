@@ -1,5 +1,5 @@
 ---
-layout: posts
+layout: sinlge
 title: "Improving Classification Performance With Human Feedback - Label a few, we label the rest 리뷰"
 summary: "Improving Classification Performance With Human Feedback - Label a few, we label the rest 리뷰"
 author: Kim Changhyeon
@@ -7,6 +7,7 @@ categories: papers
 published: True
 toc: True
 toc_sticky: True
+comments: True
 ---
 
 ### 1. 소개
