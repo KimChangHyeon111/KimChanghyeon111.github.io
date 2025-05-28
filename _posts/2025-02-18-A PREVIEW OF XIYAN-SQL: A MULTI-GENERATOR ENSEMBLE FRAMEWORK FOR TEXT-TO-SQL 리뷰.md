@@ -7,6 +7,7 @@ categories: papers
 published: True
 toc: True
 toc_sticky: True
+comments: True
 ---
 
 기존의 LLM기반 NL2SQL 솔류션에는 2가지 접근법 존재
