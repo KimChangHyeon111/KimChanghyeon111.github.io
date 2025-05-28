@@ -187,11 +187,18 @@
                     data-theme="preferred_color_scheme"
                     data-lang="ko"
                     crossorigin="anonymous"
-                    async>
-    </script>
-
+                    async></script>
       </section>
-    {% when "custom" %}
-      {% include /comments-providers/custom.html %}
+    {% when "cusdis" %}
+      <h4 class="page__comments-title">{{ comments_label }}</h4>
+      <section id="cusdis-comments">
+        <div id="cusdis_thread"
+             data-host="https://cusdis.com"
+             data-app-id="42f9f7e9-4d85-4c12-98ad-72b74c96345a"
+             data-page-id="{{ PAGE_ID }}"
+             data-page-url="{{ PAGE_URL }}"
+             data-page-title="{{ PAGE_TITLE }}"></div>
+        <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
+      </section>
   {% endcase %}
 </div>
