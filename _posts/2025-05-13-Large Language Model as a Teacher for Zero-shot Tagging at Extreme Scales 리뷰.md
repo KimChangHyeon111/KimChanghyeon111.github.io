@@ -7,6 +7,7 @@ categories: papers
 published: True
 toc: True
 toc_sticky: True
+comments: True
 ---
 ### 1. 소개
 - Extreme Zero-shot Extreme Multi-label Text Classification (EZ-XMC) : 수천개의 라벨 중에 적절한 라벨을 찾아야 하는데, 레이블이 없는 문제. 다만 레이블의 설명은 존재하는 상황에 사용이 가능함.
