@@ -326,6 +326,7 @@ defaults:
       comments: # true
       share: true
       related: true
+      comments: true
 
 # 검색용 플러그인
 plugins:
