@@ -45,12 +45,12 @@ SELECT name FROM college WHERE students > (SELECT AVG(students) ...)
     🔴 여전히 LLM을 타야 하므로 무거움
 
 
-### 4. 논문에서 제공하는 방법론
+### 4. 논문에서 제공하는 방법론  
 - GMNScore를 도입하고
 - CTE SQL에는 StepRTM을 도입하겠다!
 ![image](https://github.com/user-attachments/assets/09f62bf9-4d6d-4fe1-8077-aabf44b81136)
   
-**보상함수**  
+##### 보상함수
 ![image](https://github.com/user-attachments/assets/5e737925-7aae-45ae-849f-59488195c38a)
 1. 서브쿼리가 완성되었으면 -> StepRTM을 보상으로 적용하겠다
 2. 쿼리가 다 끝났으면 -> GMNScore를 보상으로 적용하겠다
@@ -59,7 +59,7 @@ SELECT name FROM college WHERE students > (SELECT AVG(students) ...)
 - 그러면 GMNScore랑 StepRTM이 무엇이냐?
 - 그 전에 GMN을 알려면 ROT를 알아야 함.
 
-#### ROT
+##### ROT
 - SQL을 단순히 구조만 보는 것이 아니라 (구조만 보는 것을 AST라 함) 대수적 표현으로 바꾸어 의미 중심의 비교가 가능하게 하는 것.
 - SQL의 SQL의 SELECT, WHERE, JOIN 같은 구문을 논리 연산자 노드들로 구성된 트리 형태로 변환
   - 트리의 노드(Node): Project, Filter, Join, Aggregate 등의 연산자
@@ -84,7 +84,7 @@ CTE temp:
 ```
 - 이를 통해 표현은 달라도 의미가 같은 쿼리를, 구조적으로 유사도를 잡아낼 수 있음.
 
-#### RelPM
+##### RelPM
 - (아마도) 기존 그래프 임베딩 기반 보상 모델로 보임
 - 이 각각의 노드들에 대해서 reference q의 모든 노드와 비교하고
 - 연산자 타입이 같으면 매칭후보로 간주해서
@@ -103,7 +103,7 @@ SELECT name FROM users WHERE age > 29
     🔴 타입은 같지만 (Filter) 값이 달라서(>, >=) 매칭을 실패하는 문제가 있음.
 
 
-#### GMNScore
+##### GMNScore
 - 드디어.
 - 앞서 ROT 그래프로 변환한 쿼리를 그래프 임베딩으로 생성한 뒤
 - 두 그래프 벡터간의 유사도를 유클리드 거리로 비교하는 것
@@ -164,7 +164,7 @@ SELECT name FROM users WHERE age > 29
 3. 또한 StepRTM을 추가로 도입해 중간중간 보상함수를 적용해줬더니 성능이 향상된 것을 알 수 있음.
 4. DB가 더 어렵고 복잡한 BIRD가 이런 이점을 더 누리는 것을 알 수 있다고 하는데 대충 비슷한거 아닌가 싶긴 함
 
-#### 느낀 점
+##### 느낀 점
 1. 그래프 기반 모델의 성능이 뛰어남을 증명했고.
 2. 실제 실행 없이도 비슷한 성능의 강화학습을 할 수 있다는 게 가장 큰 시의점임.
 3. StepwiseRTM을 도입해 CTE 성능을 크게 개선했다는 점도 유의미해보임
