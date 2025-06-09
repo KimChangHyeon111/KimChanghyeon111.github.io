@@ -32,6 +32,7 @@ q = SELECT score FROM posts WHERE user = ‘A’
 ##### BTRM
 - 쿼리의 실행 없이 NL 질문과 SQL 쿼리를 LLM에 넣고, 이를 임베딩하여 벡터를 점수로 변환하는 방식. 선호쌍 기반으로 학습하게 됨.
 - 예컨대 평균 학생 수보다 많은 대학의 이름을 찾으라는 질문이 있다면
+
 ```sql
 --나쁜 쿼리 :
 SELECT name FROM college WHERE students < 1000
