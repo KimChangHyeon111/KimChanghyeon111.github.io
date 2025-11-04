@@ -9,10 +9,6 @@ toc: True
 toc_sticky: True
 comments: True
 ---
-이 논문은 "A Comprehensive Benchmark of Machine and Deep Learning Across Diverse Tabular Datasets"에 대한 포괄적인 벤치마크 연구 결과를 담고 있으며, 목차별 핵심 내용은 다음과 같음. 마크다운 양식을 정확하게 준수하여 설명함.
-
----
-
 ## 요약 (Abstract)
 
 이 연구는 과학 연구 및 실제 응용 분야에서 흔히 사용되는 표 형식 데이터 분석에서 기계 학습(ML) 모델과 딥러닝(DL) 모델의 성능을 비교하는 포괄적인 벤치마크를 제시함. 기존 연구들에서 DL 모델은 종종 기존 ML 모델(예: GBMs)보다 성능이 동등하거나 열등한 것으로 나타났기 때문에, 주요 목표는 DL 모델이 우수한 성능을 보이는 데이터셋 유형을 더 잘 특성화하는 것.
