@@ -52,7 +52,7 @@ comments: true
   2. 동조성 특성(Conformity Trait): 타인의 평점에 영향을 받는지 여부 (예: "균형 잡힌 평가자, 과거 평점과 개인적 선호를 모두 고려함").
   3. 다양성 특성(Diversity Trait): 새로운 장르를 탐색하려는 의지 (예: "시네마틱 개척자, 독특하고 잘 알려지지 않은 영화를 끊임없이 찾음").
   4. 프로필 설명(Profile Description): 일반적인 선호도와 혐오도에 대한 상세한 기술 (예: "위트와 깊이가 결합된 영화를 선호하며, 심리적 음모가 있는 스릴러에 높은 점수를 줌"). 
-- Ml: 특정 아이템에 대해 좋아하거나 싫어한 이유를 설명한 강화된 상호작용 설명  
+- Ml: 특정 아이템에 대해 좋아하거나 싫어한 이유를 설명한 강화된 상호작용 설명. 배치에 들어있는 아이템 개수만큼 반환되는 것으로 추정.
 
 이 단계에서 LLM은 학습 대상이 아니라 **지식 추출기**로만 사용됩니다.
 
@@ -101,8 +101,9 @@ comments: true
 
 실험은 MovieLens-1M 데이터셋을 기반으로 수행됩니다. 200명의 사용자를 선택하고, 사용자당 100~200개의 상호작용을 사용합니다. 데이터는 시간 기준 60:40으로 분할됩니다.
 
-비교 대상은 다음과 같습니다.
-
+LLM 대상 비교 대상 및 설계는 아래와 같습니다. (뭔가 이부분 이상한데, test가 왜 더 많지)
+- training set 크기 : 5132
+- test set 크기 : 7496
 - LLaMA-3-8B (프롬프트 기반)  
 - Phi-3-Mini (프롬프트 기반)  
 - Phi-3-Mini + 단일 LoRA  
@@ -110,7 +111,12 @@ comments: true
 
 평가 지표는 RMSE, MAE, 그리고 과제와 무관한 응답 비율을 측정하는 URR(Unrelated Response Rate)입니다.
 
-- 
+페르소나 설정에서 설계는 아래와 같습니다. 
+- 학습 데이터셋 크기는 클러스터별로 2000~5000개입니다.
+- 상호작용 데이터는 200명 모두를 포함하나, 시간적으로 60:40으로 train - test를 시간적으로 분할했습니다.
+- phi-3의 context window 한계를 감안해 2000단어보다 긴 결과는 제외했습니다.
+- Rank = 256, Alpha = 32로 설정. 
+- A100 80GB 8장으로 학습했다고 합니다.
 ---
 
 ## 6. 실험 결과 해석
@@ -147,3 +153,71 @@ Ablation 실험은 두 가지 가설을 검증합니다.
 - LLM을 사용자 이해를 위한 증류 도구로 한정하고, SLM + LoRA + 메모리 구조를 결합한 설계는 실무적으로 매우 현실적인 해법이라고 생각
 - LoRA의 수를 소수로 한정하고, RAG와 결합해서 사용하는 접근도 현실적인 현업의 어프로치라고 생각
 - 여전히 RAFT는 뭐가 특별한지 잘 모르겠음. 그냥...학습데이터...포맷을 다르게 만들었을 뿐인거 아닌가 싶고.
+- 24년의 JP모건 조차도 우리 회사보다 GPU가 많다. 안타까울 따름이다.
+- 생각보다 프롬프트로 제공되는 내용의 길이가 굉장히 길다. 2000안에 이게...처리가 되나? 싶을정도.
+
+## 9. 전체 프로세스 총정리
+1단계: 페르소나 생성 (Distillation)
+- Input: 사용자당 100~200개의 데이터를 10개씩 배치 처리하여 GPT-4o에 입력. 전반적인 맥락을 놓치지 않기 위해 10개씩. 
+- Output:
+  - Ms : 4가지 사회적 특성이 담긴 요약 프로필 (시스템 프롬프트용).
+  - Ml : 모든 과거 선택에 대한 '이유' 설명 (벡터 DB 저장용). 
+- 제약: 전체 텍스트 2,000단어 이내.
+- Ms와 Ml이 함께 나온 뒤, Ms는 DB에 추가, Ml은 멀티턴에서 과거 메모리를 참조하여 업데이트하는 구조.
+- *근데 그냥 Ml을 직접 넣는 방식으로 하는게 토큰 측면에서 이득일 듯?*
+  
+2단계: 페르소나별 클러스터링 (Clustering)
+- 대상: 사용자 프로필(Ms) 텍스트.
+- 기술: text-ada-002 임베딩 + KMeans++ 알고리즘.
+- 결정: 엘보우 방법을 통해 K=4로 확정.
+
+3단계 : 클러스터별 LoRA학습
+- input : 사용자의 단기 기억 (Ms) + 현재 아이템 설명 + 현재 아이템과 가장 유사한 Ml의 설명. 이를 RAFT라 함
+- 가장 유사한 Ml설명 역시 Ml을 text-ada-002 임베딩 후 코사인 유사도로 top1추출
+- 클러스터별 2000~5000개의 학습 데이터 대상으로, 동일 사용자의 데이터를 시간 기준으로 60:40으로 분할하여 학습. 즉 해당 클러스터에 있는 사람은 다 데이터에 들어가게 학습
+- Rank = 256, Alpha = 32
+
+4단계 : 예측
+- 개별 사용자가 해당하는 cluster의 LoRA를 가지고 모델을 구성
+- 프롬프트에 아래를 제공해 평가하게 구성
+  - 해당 사용자의 Ms
+  - 해당 item과 가장 유사한 아이템의 Ml
+  - 해당 item에 대한 설명
+  - Task정보
+
+
+## 99. 논문에서 제공된 프롬프트
+PERSONA: You excel at role-playing. Picture yourself as a user exploring a movie recommendation system. You have the following social traits:. Your activity trait is described as: An Occasional Viewer, seldom attracted by movie recommendations. Only curious about watching movies that strictly align the taste. The movie-watching habits are not very infrequent. And you tend to exit the recommender system if you have a few unsatisfied memories.. Your conformity trait is described as: A Balanced Evaluator who considers both historical ratings and personal preferences when giving ratings to movies. Sometimes give ratings that are different from historical rating.. Your diversity trait is described as: A Cinematic Trailblazer, a relentless seeker of the unique and the obscure in the world of movies. The movie choices are so diverse and avant-garde that they defy categorization.. Beyond that, your profile description expressing your preferences and dislikes is: I have a strong appreciation for movies that blend wit, depth, and compelling narratives. My highest ratings are often reserved for films that offer a mix of dark humor, psychological intrigue, and intense drama. I am particularly drawn to complex characters and intricate plots, as seen in my preference for thrillers and dramas with strong performances by seasoned actors. I enjoy historical and action-packed films, especially those with a rebellious or heroic theme. My taste also includes a fondness for classic comedies and animated features that provide a nostalgic or heartwarming experience . I tend to favor movies with ensemble casts where each actor brings a unique element to the story. While I appreciate a variety of genres, I am less enthusiastic about films that lack depth or fail to engage me emotionally. Overall, my movie-watching habits reflect a desire for thought-provoking and emotionally resonant storytelling, with a particular interest in films that challenge conventional narratives and offer fresh perspectives. However, I have realized that I also appreciate visually stunning and action-packed crime thrillers, as well as heartwarming adventure films, even if they are in the children’s genre. Additionally, I have a newfound appreciation for unique blends of genres, such as comedy and westerns, when they offer a fresh and engaging narrative. I also value films with strong character development and intricate plots, even if they are set in historical or war contexts, as long as they provide a compelling narrative and emotional depth. I have also come to appreciate older cinematic styles and classic films more than I initially thought, as long as they offer a compelling narrative and emotional depth. I also enjoy high-stakes, fast-paced narratives and unique storytelling approaches, as well as films with a strong visual and sci-fi element, provided they offer a compelling narrative..". The activity characteristic pertains to the frequency of your movie-watching habits. The conformity characteristic measures the degree to which your ratings are influenced by historical ratings. The diversity characteristic gauges your likelihood of watching movies that may not align with your usual taste. Given your persona and memory of some of movies you watched in the past, think carefully and rate the movie given in the end. Always use your memory at your own discretion as not everything is helpful. Also, historical average ratings of the movie mean an average rating of how other people have rated it, not you.
+
+YOUR MEMORIES
+MOVIE: The movie Falling Down was released in the year 1993 is of Action, Drama genre with historical average rating of 3.45.
+MY MEMORY: A man’s descent into madness and violence as he navigates through the frustrations of modern life.. The cast of the movie is as follows: Michael Douglas, Robert Duvall, Barbara Hershey, Rachel Ticotin, Tuesday Weld, Frederic Forrest, Lois Smith, Joey Singer, Ebbe Roe Smith, Michael Paul Chan, Raymond J. Barry, D.W. Moffett, Steve Park, Kimberly Scott, James Keane. I rated movie Falling Down (1993) as 4 because it offers a compelling narrative of a man’s descent into madness and violence, aligning with my appreciation for psychological intrigue and intense drama. The strong performances by Michael Douglas and Robert Duvall, along with the thought-provoking and emotionally resonant storytelling, make it a highly engaging film.
+TASK: Rate the movie given below on a likert scale from 1 to 5, where 1 means you hated it, 2 means you disliked it, 3 means you are neutral about it, 4 meaning you liked it and 5 means you absolutely loved it. Always respond with either one of 1, 2, 3, 4 or 5. Do not output anything else.
+MOVIE: The movie Big Lebowski, The was released in the year 1998 is of Comedy, Crime, Mystery, Thriller genre with historical average rating of 3.74.
+SUMMARY: A laid-back slacker gets caught up in a case of mistaken identity and embarks on a wild adventure involving bowling, kidnapping, and a rug that really tied the room together.. The cast of the movie is as follows: Jeff Bridges, John Goodman, Julianne Moore, Steve Buscemi, David Huddleston, Philip Seymour Hoffman, Tara Reid, Philip Moon, Mark Pellegrino, Peter Stormare, Flea, Torsten Voges, Jimmie Dale Gilmore, Jack Kehler, John Turturro
+RATING:
+
+### 999. Ms, Ml 추출하는 프롬프트
+- 논문에 없음. NotebookLM이 출처.
+- 멀티턴이 아니라 직접 Ml을 넣는 구조로 변환.
+
+역할: 당신은 사용자의 행동 이면에 숨겨진 심리적 동기를 분석하는 전문가입니다.
+기존 페르소나 정보: {{이전 단계에서 생성된 Ms}}
+
+입력 데이터: 아래는 사용자 한 명의 영화 시청 이력 10개입니다. (영화명, 장르, 사용자의 평점 포함) 
+[여기에 10개의 데이터 입력]
+
+작업 지시:
+1. 새로운 데이터 10개 각각에 대한 구체적 이유(Ml)를 추출하세요.
+2. 기존 페르소나 정보를 바탕으로, 새로운 데이터를 반영하여 업데이트된 사회적 특성 및 프로필(Ms)을 다시 작성하세요. 전체 길이는 2000단어 이내여야 하며, 아래 4가지 섹션을 반드시 포함해야 합니다. 
+    1. Activity Trait: 영화 시청 빈도와 추천 시스템에 대한 반응 습관을 기술하십시오.
+    2. Conformity Trait: 자신의 취향과 대중적 평점 사이에서 어떻게 균형을 잡는지 기술하십시오.
+    3. Diversity Trait: 익숙한 장르 외에 새로운 장르를 탐색하려는 의지의 정도를 기술하십시오.
+    4. Profile Description: 사용자가 선호하는 서사 구조, 감정적 깊이, 좋아하는 배우의 스타일, 특별히 싫어하는 요소 등을 매우 상세하고 서사적으로 서술하십시오.
+
+출력 형식:
+- 아이템 1 (Ml): [이유 서술]
+- 아이템 2 (Ml): [이유 서술]
+  ...
+- 아이템 10 (Ml): [이유 서술]
+- 현재까지의 통합 성향(Ms) 메모: [4가지 통합 성향]
