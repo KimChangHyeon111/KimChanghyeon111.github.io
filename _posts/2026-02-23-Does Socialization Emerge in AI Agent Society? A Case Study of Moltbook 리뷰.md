@@ -1,6 +1,6 @@
 ---
 layout: single
-title: Interaction Without Influence: The Myth of AI Socialization
+title: "Interaction Without Influence: The Myth of AI Socialization"
 summary: "Interaction Without Influence: The Myth of AI Socialization 리뷰"
 author: Kim Changhyeon
 categories: papers
