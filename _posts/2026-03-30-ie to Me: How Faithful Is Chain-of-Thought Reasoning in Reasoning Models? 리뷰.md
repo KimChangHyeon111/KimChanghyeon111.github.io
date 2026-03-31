@@ -1,6 +1,6 @@
 ---
 layout: single
-title: "진짜 이유를 말해줘! AI의 생각 과정, 얼마나 믿을 수 있을까?"
+title: "ie to Me: How Faithful Is Chain-of-Thought Reasoning in Reasoning Models? 리뷰"
 summary: ""
 author: Kim Changhyeon
 categories: papers
